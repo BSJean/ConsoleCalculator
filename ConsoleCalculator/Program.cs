@@ -1,173 +1,268 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace ConsoleCalculator
 {
-    class Program
+    interface IOperation
     {
-        static void Main(string[] args)
+        double Call(params double[] args);
+    }
+
+    public delegate double delegateFunction(params double[] args);
+
+
+    public class Operation : IOperation
+    {
+        delegateFunction delFunction;
+        static Dictionary<String, IOperation> SupportedFunctions;
+        
+        public Operation(delegateFunction function)
+        {
+            delFunction = function;
+        }
+
+        public double Call(params double[] args)
+        {
+            return delFunction(args);
+        }
+
+        private static double Add(params double[] args)
+        {
+            return args.Sum();
+        }
+
+        private static double Subtract(params double[] args)
+        {
+            double result = 2 * args[0];
+            foreach (double n in args)
+            {
+                result -= n;
+            }
+            return result;
+        }
+
+        private static double Multiple(params double[] args)
+        {
+            double result = 1;
+            foreach (double n in args)
+            {
+                result *= n;
+            }
+            return result;
+        }
+
+        private static double Divide(params double[] args)
+        {
+            return args[0] / args[1];
+        }
+
+        private static double Acos(params double[] args)
+        {
+            return Math.Acos(args[0]);
+        }
+
+        private static double Asin(params double[] args)
+        {
+            return Math.Asin(args[0]);
+        }
+
+        private static double Atan(params double[] args)
+        {
+            return Math.Atan(args[0]);
+        }
+
+        private static double Atan2(params double[] args)
+        {
+            return Math.Atan2(args[0], args[1]);
+        }
+
+        private static double Cos(params double[] args)
+        {
+            return Math.Cos(args[0]);
+        }
+
+        private static double Cosh(params double[] args)
+        {
+            return Math.Cosh(args[0]);
+        }
+
+        private static double Exp(params double[] args)
+        {
+            return Math.Exp(args[0]);
+        }
+
+        private static double Log(params double[] args)
+        {
+            if (args.Length == 1)
+                return Math.Log(args[0]);
+            else
+                return Math.Log(args[0], args[1]);
+        }
+
+        private static double Log10(params double[] args)
+        {
+            return Math.Log10(args[0]);
+        }
+
+        private static double Pow(params double[] args)
+        {
+            return Math.Pow(args[0], args[1]);
+        }
+
+        private static double Sin(params double[] args)
+        {
+            return Math.Sin(args[0]);
+        }
+
+        private static double Sinh(params double[] args)
+        {
+            return Math.Sinh(args[0]);
+        }
+
+        private static double Sqrt(params double[] args)
+        {
+            return Math.Sqrt(args[0]);
+        }
+
+        private static double Tan(params double[] args)
+        {
+            return Math.Tan(args[0]);
+        }
+
+        private static double Tanh(params double[] args)
+        {
+            return Math.Tanh(args[0]);
+        }
+
+        public static void DictionarySet()
+        {
+            SupportedFunctions = new Dictionary<string, IOperation>();
+            SupportedFunctions.Add("+", new Operation(Add));
+            SupportedFunctions.Add("-", new Operation(Subtract));
+            SupportedFunctions.Add("*", new Operation(Multiple));
+            SupportedFunctions.Add("/", new Operation(Divide));
+            SupportedFunctions.Add("acos", new Operation(Acos));
+            SupportedFunctions.Add("asin", new Operation(Asin));
+            SupportedFunctions.Add("atan", new Operation(Atan));
+            SupportedFunctions.Add("atan2", new Operation(Atan2));
+            SupportedFunctions.Add("cos", new Operation(Cos));
+            SupportedFunctions.Add("cosh", new Operation(Cosh));
+            SupportedFunctions.Add("exp", new Operation(Exp));
+            SupportedFunctions.Add("log", new Operation(Log));
+            SupportedFunctions.Add("log10", new Operation(Log10));
+            SupportedFunctions.Add("pow", new Operation(Pow));
+            SupportedFunctions.Add("sin", new Operation(Sin));
+            SupportedFunctions.Add("sinh", new Operation(Sinh));
+            SupportedFunctions.Add("sqrt", new Operation(Sqrt));
+            SupportedFunctions.Add("tan", new Operation(Tan));
+            SupportedFunctions.Add("tanh", new Operation(Tanh));
+        }
+
+        static void Help()
         {
             Console.WriteLine(@"Supported Features: * / + - Acos Asin Atan Atan2
                     Cos Cosh Exp Log Log10 Pow 
-                    Sin Sinh Sqrt Tan Tanh");
-            Console.ReadLine();
+                    Sin Sinh Sqrt Tan Tanh.
+                    Type help or info for this information.
+                    Type end or quit for exit.");
         }
 
-        public delegate double delegateFunction(params double[] args);
-
-        interface IOperation
+        static void Run()
         {
-            double Call(params double[] args);
-        }
 
-        public class Operation : IOperation
-        {
-            delegateFunction delFunction;
-            private Dictionary<String, IOperation> SupportedFunctions = new Dictionary<string, IOperation>();
-            
-            public Operation()
+            string opString, cmd;
+            bool isRight = false;
+            do
             {
-                SupportedFunctions.Add("+", new Operation(Add));
-                SupportedFunctions.Add("-", new Operation(Subtract));
-                SupportedFunctions.Add("*", new Operation(Multiple));
-                SupportedFunctions.Add("/", new Operation(Divide));
-                SupportedFunctions.Add("Acos", new Operation(Acos));
-                SupportedFunctions.Add("Asin", new Operation(Asin));
-                SupportedFunctions.Add("Atan", new Operation(Atan));
-                SupportedFunctions.Add("Atan2", new Operation(Atan2));
-                SupportedFunctions.Add("Cos", new Operation(Cos));
-                SupportedFunctions.Add("Cosh", new Operation(Cosh));
-                SupportedFunctions.Add("Exp", new Operation(Exp));
-                SupportedFunctions.Add("Log", new Operation(Log));
-                SupportedFunctions.Add("Log10", new Operation(Log10));
-                SupportedFunctions.Add("Pow", new Operation(Pow));
-                SupportedFunctions.Add("Sin", new Operation(Sin));
-                SupportedFunctions.Add("Sinh", new Operation(Sinh));
-                SupportedFunctions.Add("Sqrt", new Operation(Sqrt));
-                SupportedFunctions.Add("Tan", new Operation(Tan));
-                SupportedFunctions.Add("Tanh", new Operation(Tanh));
-            }
-
-            public Operation(delegateFunction function)
-            {
-                delFunction = function;
-            }
-
-            public double Call(params double[] args)
-            {
-                return delFunction(args);
-            }
-
-            public double Add(params double[] args)
-            {
-                return args.Sum();
-            }
-
-            public double Subtract(params double[] args)
-            {
-                double result = 2 * args[0];
-                foreach (double n in args)
+                Console.Write("Op: ");
+                cmd = opString = Console.ReadLine().Trim(' ').ToLower();
+                if (cmd == "end" || cmd == "quit")
                 {
-                    result -= n;
+                    Environment.Exit(0);
                 }
-                return result;
-            }
-
-            public double Multiple(params double[] args)
-            {
-                double result = 1;
-                foreach (double n in args)
+                else if (cmd == "help" || cmd == "info")
                 {
-                    result *= n;
+                    Help();
                 }
-                return result;
-            }
-
-            public double Divide(params double[] args)
-            {
-                return args[0] / args[1];
-            }
-
-            public double Acos(params double[] args)
-            {
-                return Math.Acos(args[0]);
-            }
-
-            public double Asin(params double[] args)
-            {
-                return Math.Asin(args[0]);
-            }
-
-            public double Atan(params double[] args)
-            {
-                return Math.Atan(args[0]);
-            }
-
-            public double Atan2(params double[] args)
-            {
-                return Math.Atan2(args[0],args[1]);
-            }
-
-            public double Cos(params double[] args)
-            {
-                return Math.Cos(args[0]);
-            }
-
-            public double Cosh(params double[] args)
-            {
-                return Math.Cosh(args[0]);
-            }
-
-            public double Exp(params double[] args)
-            {
-                return Math.Exp(args[0]);
-            }
-
-            public double Log(params double[] args)
-            {
-                if (args.Length==1)
-                    return Math.Log(args[0]);
                 else
-                    return Math.Log(args[0], args[1]);
-            }
+                {
+                    foreach (string s in SupportedFunctions.Keys)
+                    {
+                        if (s == opString)
+                        {
+                            isRight = true;
+                            break;
+                        }
+                    }
+                    if (!isRight)
+                    {
+                        Console.WriteLine("Wrong operation!");
+                    }
+                }
+            } while (!isRight);
 
-            public double Log10(params double[] args)
+            List<double> argsList = new List<double>();
+            isRight = false;
+            do
             {
-                return Math.Log10(args[0]);
-            }
+                Console.Write("Args: ");
+                string[] argsString = Console.ReadLine().Split(' ');
+                cmd = argsString[0];
+                if (cmd == "end" || cmd == "quit")
+                    Environment.Exit(0);
+                foreach (string s in argsString)
+                {
+                    double result;
+                    if (Double.TryParse(s, out result))
+                    {
+                        argsList.Add(result);
+                        isRight = true;
+                    }
+                    else if (s != "")
+                    {
+                        isRight = false;
+                        break;
+                    }
+                }
+                if (!isRight)
+                {
+                    Console.WriteLine("Wrong arguments!");
+                    argsList.Clear();
+                }
+                if (isRight && argsList.Count == 1)
+                {
+                    if (opString == "/" || opString == "atan2" || opString == "pow"
+                        || opString == "*" || opString == "+" || opString == "-")
+                    {
+                        isRight = false;
+                        Console.WriteLine("Not enough arguments!");
+                        argsList.Clear();
+                    }
+                }
+                if (isRight && opString == "/" && argsList[1] == 0)
+                {
+                    Console.WriteLine("Can not divide by zero!");
+                    isRight = false;
+                    argsList.Clear();
+                }
 
-            public double Pow(params double[] args)
-            {
-                return Math.Pow(args[0],args[1]);
-            }
+            } while (!isRight);
 
-            public double Sin(params double[] args)
-            {
-                return Math.Sin(args[0]);
-            }
-
-            public double Sinh(params double[] args)
-            {
-                return Math.Sinh(args[0]);
-            }
-
-            public double Sqrt(params double[] args)
-            {
-                return Math.Sqrt(args[0]);
-            }
-
-            public double Tan(params double[] args)
-            {
-                return Math.Tan(args[0]);
-            }
-
-            public double Tanh(params double[] args)
-            {
-                return Math.Tanh(args[0]);
-            }
+            double[] argsFunc = argsList.ToArray();
+            double res = SupportedFunctions[opString].Call(argsFunc);
+            Console.WriteLine($"Result: {res}\n");
         }
 
+        static void Main(string[] args)
+        {
+            Help();
+            DictionarySet();
+            while (true)
+            {
+                Run();
+            }
+        }
     }
 }
